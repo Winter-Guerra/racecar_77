@@ -35,7 +35,7 @@ class ColorTracker:
         rospy.loginfo("[%s] Initialized." %(self.node_name))
 
         self.dirname = '/home/racecar/challenge_photos/'
-<<<<<<< HEAD
+
         
 	self.lock = threading.Lock()
 

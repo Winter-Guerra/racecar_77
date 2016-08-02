@@ -129,7 +129,7 @@ class PotentialField:
         command_msg.drive.steering_angle = (self.p_steering * np.sign(total_x_component) * math.atan2(total_y_component, total_x_component))
         command_msg.drive.speed = (self.p_speed * np.sign(total_x_component) * math.sqrt(total_x_component**2 + total_y_component**2))
         command_msg.drive.speed = self.kickOut(command_msg.drive.speed)
-        print (command_msg.drive.steering_angle * 180)/math.pi
+        print command_msg
         #print command_msg.drive.speed
         # Publish the command
         self.pub_nav.publish(command_msg)

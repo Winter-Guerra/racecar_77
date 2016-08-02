@@ -1,0 +1,7 @@
+<launch>
+	<include file="$(find racecar)/launch/teleop.launch"/>
+    	<include file="$(find zed_wrapper)/launch/zed.launch"/>
+	<node name="save_color" pkg="final77" type="detector.py" />
+	<node name="potential_field_node" pkg="final77" type="pfield_winter.py"/>
+	<node name="ColorTracker" pkg="final77" type="save_blob.py"/>
+</launch>

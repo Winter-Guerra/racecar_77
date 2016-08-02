@@ -100,7 +100,7 @@ class ColorTracker:
         c = sorted_contours[0]
 
         area = cv2.contourArea(c)
-        if area < 1000: # minimum area threshold
+        if area < 5000: # minimum area threshold
             return None
 
         perim = cv2.arcLength(c, True) # perimeter

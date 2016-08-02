@@ -5,7 +5,7 @@ import rospy
 
 from sensor_msgs.msg import Image
 from std_msgs.msg import Int32MultiArray
-from final77.msg import blob as BlobMsg
+from racecar_77.msg import blob as BlobMsg
 
 from cv_bridge import CvBridge, CvBridgeError
 import threading
@@ -34,20 +34,29 @@ class ColorTracker:
         thread.start()
 
     def detection(self, img):
-        green_lower = np.array([54, 30, 60])
-        green_upper = np.array([72, 255, 255])
+        #bottom_dim = img.shape[0]
+	#img = img[bottom_dim-20:, :, :]
+
+        green_lower = np.array([50, 30, 60])
+        green_upper = np.array([77, 255, 255])
 
         color = "GREEN"
         ret = self.detect_color_blob(img, green_lower, green_upper, color)
         color_code = 1
         
         if ret == None:
-            red_lower = np.array([0, 160, 130])
+            red_lower = np.array([0, 130, 130])
             red_upper = np.array([15, 255, 255])
             color = "RED"
             ret = self.detect_color_blob(img, red_lower, red_upper, color)
             color_code = 2
-            
+
+        if ret == None:
+            red_lower = np.array([170, 130, 130])
+            red_upper = np.array([180, 255, 255])
+            color = "RED"
+            ret = self.detect_color_blob(img, red_lower, red_upper, color)
+            color_code = 2            
 
         if ret == None:
             cx = 0

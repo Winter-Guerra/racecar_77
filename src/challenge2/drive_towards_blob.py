@@ -2,7 +2,7 @@
 import rospy
 from ackermann_msgs.msg import AckermannDriveStamped
 from std_msgs.msg import Int32MultiArray, Int32
-from final77.msg import blob as BlobMsg
+from racecar_77.msg import blob as BlobMsg
 
 import math
 
@@ -88,7 +88,7 @@ class Control:
             
     def nudge_callback(self, _):
         if self.direction == 'left':
-            self.drive(1.5, 0.40)
+            self.drive(1.0, 0.35)
         elif self.direction == 'right':
             self.drive(1.0, -0.35)
 

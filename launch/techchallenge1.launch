@@ -1,6 +1,8 @@
+
 <launch>
 	<include file="$(find racecar)/launch/teleop.launch"/>
     	<include file="$(find zed_wrapper)/launch/zed.launch"/>
+	<node name="SafetyMech" pkg="racecar_77" type="safety_mech.py"/>
 	<node name="potential_field_node" pkg="racecar_77" type="challenge1Drive.py"/>
 	<node name="ColorTracker" pkg="racecar_77" type="challenge1Blob.py" output="screen"/>
 </launch>

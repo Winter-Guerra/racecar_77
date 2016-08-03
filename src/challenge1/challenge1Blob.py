@@ -52,7 +52,7 @@ class ColorTracker:
 
     def detection(self, img):
 
-        bounds = [["green", [50, 100, 100], [77, 255, 255]], ["red", [0, 130, 130], [10, 255, 255]], ["red", [170, 130, 130], [180,255,255]], ["blue", [100, 60, 80], [130, 255, 255]], ["yellow", [14, 100, 136], [29, 255, 255]], ["racecar", [0, 0, 0], [0, 0, 0]], ["ari", [0, 0, 0], [0, 0, 0]], ["professor karaman", [0, 0, 0], [0, 0, 0]], ["cat", [0, 0, 0], [0, 0, 0]]]
+        bounds = [["green", [50, 100, 80], [77, 255, 255]], ["red", [0, 130, 130], [13, 255, 255]], ["red", [170, 130, 130], [180,255,255]], ["blue", [113, 100, 64], [130, 255, 179]], ["yellow", [25, 150, 136], [37, 255, 255]]]
         
         for i in bounds:
             lower = np.array(i[1])
@@ -100,7 +100,7 @@ class ColorTracker:
         c = sorted_contours[0]
 
         area = cv2.contourArea(c)
-        if area < 1000: # minimum area threshold
+        if area < 5000: # minimum area threshold
             return None
 
         perim = cv2.arcLength(c, True) # perimeter

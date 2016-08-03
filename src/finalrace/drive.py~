@@ -45,6 +45,7 @@ class PotentialField:
         
     def bool_back(self, msg):
         self.turn_right = msg.data
+        print self.turn_right
         print "boolBack"
         
     def turn(self,  ranges):

@@ -52,12 +52,12 @@ class safetyMech:
       else:
         self.drive_msg.drive.steering_angle = self.lastSteerAngle
         self.drive_msg.drive.speed = 0.0
-      self.counter += 1
+      self.count += 1
       self.drive_msg.header.stamp = rospy.Time.now()
       self.publisher.publish(self.drive_msg)
       #rospy.Rate(8).sleep()
     else:
-      self.counter = 0
+      self.count = 0
       if self.emergency_lock.locked():
 	self.emergency_lock.release()
 '''    

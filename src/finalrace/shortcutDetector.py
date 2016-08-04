@@ -68,7 +68,7 @@ class LightTracker:
         c = sorted_contours[0]
 
         area = cv2.contourArea(c)
-        if area < 1000: # minimum area threshold'
+        if area < 2000: # minimum area threshold'
             print lower
             print area
             print "too small"
@@ -89,8 +89,10 @@ class LightTracker:
             cv2.putText(img, color, coord, cv2.FONT_HERSHEY_PLAIN, 3, (255, 255, 255),  2)
             
         M = cv2.moments(approx)
-        cx, cy = int(M['m10']/M['m00']), int(M['m01']/M['m00'])
-
+	try:
+        	cx, cy = int(M['m10']/M['m00']), int(M['m01']/M['m00'])
+	except:
+		cx,cy = 0 , 0
         self.notification = True
         print self.notification
         now = rospy.Time.now()

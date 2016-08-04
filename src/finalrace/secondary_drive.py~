@@ -7,15 +7,15 @@ from std_msgs.msg import Bool
 import math
 from PID import PIDController
 
-PID_KP = 0.9
+PID_KP = 1.0
 PID_KP_countclock = 0.0035
 PID_KI = 0.0
 PID_KD = 0.01
 SLICE_LEN = 50
 class twoWallFollow:
     def __init__(self):
-        rospy.Subscriber('/scan', LaserScan, self.laser_callback, queue_size=10)
-        self.publisher = rospy.Publisher('/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped, queue_size=10)
+        rospy.Subscriber('/scan', LaserScan, self.laser_callback, queue_size=1)
+        self.publisher = rospy.Publisher('/vesc/ackermann_cmd_mux/input/navigation', AckermannDriveStamped, queue_size=1)
         rospy.Subscriber('/turnRight', Bool, self.bool_back)
         self.rangeStarted = False
         self.turn_right = False
@@ -52,7 +52,7 @@ class twoWallFollow:
                     currLen = currEnd - currStart
                     #print currLen
                     if currLen > maxLen:
-                        print "this"
+                        #print "this"
                         maxLen = currLen
                         maxStart = currStart
                         maxEnd = currEnd
@@ -61,15 +61,19 @@ class twoWallFollow:
                     continue
         targetPoint = (maxEnd + maxStart)/2 + 180 if maxEnd != 0 else 540 
         print targetPoint
-	print maxLen
+	#print maxLen
         error = (targetPoint * msg.angle_increment) + msg.angle_min
 	
         steer_angle = self.pid.update(error,  rospy.Time.now())
-	print steer_angle
+	#print steer_angle
         self.drive_msg = AckermannDriveStamped()
         self.drive_msg.drive.speed = 2.0 if maxLen >= 115 else -1.0
         self.drive_msg.drive.steering_angle = steer_angle
-        self.drive_pub.publish(self.drive_msg)
+	if self.turn_right:	
+		print "twoWallFollow"
+	        self.publisher.publish(self.drive_msg) 
+	else:
+		return
 
 if __name__ == "__main__":
     rospy.init_node("TwoWallFollow")

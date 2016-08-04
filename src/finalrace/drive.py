@@ -48,46 +48,7 @@ class PotentialField:
         print self.turn_right
         print "boolBack"
         
-    def turn(self,  ranges):
-        print "Turn"
-        masked = map(lambda x: int(x>8.0),  ranges)
-        lengths = [] # stores mask data in form [start,end,len]
-        started = False
-        for i in range(180, 901):
-            if started == False and masked[i]:
-                started = True
-                currStart = i
-                currLen = 1
-            elif masked[i]:
-                currLen += 1
-            else:
-                if started:
-                    started = False
-                    lengths.append([currStart, i, currLen])
-                else:
-                    pass
-        sortedLen = sorted(lengths,key=lambda x: x[2])
-        #print sortedLen
-        if len(sortedLen) < 2:
-            return
-        if sortedLen[0][1] > sortedLen[1][1]:
-            mdpt = (sortedLen[1][0] + sortedLen[1][1])/2
-            endIndex = sortedLen[1][1]
-        else:
-            mdpt = (sortedLen[0][1] + sortedLen[0][0])/2
-            endIndex = sortedLen[0][1]
-        average = sum(ranges[endIndex+1:endIndex+6])/5
-        
-        turn_rad_angle = self.angle_increment * mdpt + self.angle_min
-        print mdpt
-        turn_x_uv = -np.cos(turn_rad_angle)
-        turn_y_uv = -np.sin(turn_rad_angle)
-        print (turn_rad_angle * 180)/math.pi
-        self.turn_x_component = np.ones(1)*(0.5 * turn_x_uv)/(average**2)
-        self.turn_y_component = np.ones(1)*(0.5 * turn_y_uv)/(average**2)
-        #print "turn calc'ed"
-        #print self.turn_x_component
-        #print self.turn_y_component
+    
     def scan_callback(self, msg):
         # Debug
         self.angle_increment = msg.angle_increment
@@ -109,8 +70,8 @@ class PotentialField:
         kick_y_component = np.zeros(1)
         # Look for turn right code
         if self.turn_right:
-            print str(self.turn_right) + " starting turn"
-            self.turn(msg.ranges)
+            print "turn"    
+            return
         # Add together the gradients to create a global gradient showing the robot which direction to travel in
         total_x_component = np.sum(scan_x_components) + kick_x_component + self.turn_x_component
         total_y_component = np.sum(scan_y_components) + kick_y_component + self.turn_y_component

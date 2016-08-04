@@ -27,6 +27,7 @@ class PotentialField:
         self.charge_laser_particle = 0.065
         self.charge_forward_boost = 25.0
         self.boost_distance = 0.5
+	self.certainty = 0
         self.p_speed = 0.05       
         self.p_steering = 1.0
         self.turn_right = False
@@ -46,6 +47,12 @@ class PotentialField:
         
     def bool_back(self, msg):
         self.turn_right = msg.data
+	self.certainty = 0.5 * self.certainty
+	self.certainty += 0.5 if self.turn_right else 0
+	if self.certainty > 0.4:
+		self.turn_right = True
+	else:
+		self.turn_right = False
         #print self.turn_right
         print "boolBack" + str(msg.data)
         
@@ -72,6 +79,7 @@ class PotentialField:
         # Look for turn right code
         if self.turn_right:
 	    kick_y_component = np.ones(1) * -25.0
+	    kick_x_component *= 0.75
 	    self.charge_laser_particle = 0.1
             print "turn"
 	else:

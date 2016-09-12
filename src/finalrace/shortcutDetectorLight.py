@@ -29,7 +29,7 @@ class LightTracker:
     def detection(self, img):
         self.notification = False
         #print "detection"
-        bounds = [["red", [0, 100, 100], [15,255,255]]]
+        bounds = [["red", [0, 75, 100], [10,255,255]]]
 
         for i in bounds:
             lower = np.array(i[1])

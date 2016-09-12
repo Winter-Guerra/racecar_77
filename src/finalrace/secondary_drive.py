@@ -21,8 +21,10 @@ class twoWallFollow:
         self.turn_right = False
         self.drive_msg = AckermannDriveStamped()
         self.pid = PIDController(rospy.Time.now(),  PID_KP,PID_KI,PID_KD)
+    
     def bool_back(self, msg):
         self.turn_right = msg.data
+    
     def laser_callback(self, msg):
         ranges = map(lambda x: int(x>1.5),  msg.ranges)
 	ranges= ranges[180:901]

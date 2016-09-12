@@ -3,6 +3,7 @@
 '''
 Created by Winter Guerra <winterg@mit.edu> on July 2016.
 Modified by Team 77 (Clara Li, Jack Messina, Aman Jha, Justin Yu, Caleb Trotz) in July/August 2016
+Modified again by Winter Guerra on 9/12
 '''
 
 # import main ROS python library
@@ -24,12 +25,13 @@ class PotentialField:
     # class constructor; subscribe to topics and advertise intent to publish
     def __init__(self):
         # initialize potential field variables
-        self.charge_laser_particle = 0.065
+        self.charge_laser_particle = 0.055
         self.charge_forward_boost = 25.0
         self.boost_distance = 0.5
 	self.certainty = 0
         self.p_speed = 0.05       
         self.p_steering = 1.0
+	self.p_d = 0.5
         self.turn_right = False
 	self.last_y = 0.0
         self.turn_x_component = np.zeros(1)
@@ -47,14 +49,9 @@ class PotentialField:
         
     def bool_back(self, msg):
         self.turn_right = msg.data
-	self.certainty = 0.5 * self.certainty
-	self.certainty += 0.5 if self.turn_right else 0
-	if self.certainty > 0.4:
-		self.turn_right = True
-	else:
-		self.turn_right = False
-        #print self.turn_right
-        print "boolBack" + str(msg.data)
+	self.certainty = 19.0*self.certainty/20.0 + self.turn_right/20.0
+	self.turn_right = (self.certainty > 0.7)
+        print "Should I turn: {}".format(self.certainty)
         
     
     def scan_callback(self, msg):
@@ -76,22 +73,21 @@ class PotentialField:
         kick_x_component = np.ones(1) * self.charge_forward_boost / self.boost_distance**2.0
 	kick_y_component = np.zeros(1)
 
-        # Look for turn right code
-        if self.turn_right:
-	    kick_y_component = np.ones(1) * -25.0
-	    kick_x_component *= 0.75
-	    self.charge_laser_particle = 0.1
-            print "turn"
-	else:
-	    self.charge_laser_particle = 0.07
+	# Make the robot turn
+	kick_y_component += (20.0)
+
+	# Make the robot stop on red
+	should_brake = not self.turn_right
     
 	scan_x_components = (self.charge_laser_particle * scan_x_unit_vectors) / np.square(ranges)
         scan_y_components = (self.charge_laser_particle * scan_y_unit_vectors) / np.square(ranges)
         # Add together the gradients to create a global gradient showing the robot which direction to travel in
-        total_x_component = np.sum(scan_x_components) + kick_x_component + self.turn_x_component
-        total_y_component = np.sum(scan_y_components) + kick_y_component + self.turn_y_component
+        total_x_component = np.sum(scan_x_components) + kick_x_component
+        total_y_component = np.sum(scan_y_components) + kick_y_component
 
 	d_val = self.last_y - total_y_component
+
+        #print self.p_steering * np.sign(total_x_component) * math.atan2(total_y_component+self.p_d*d_val, total_x_component)
 
         # Transform this gradient vector into a PoseStamped object
         visualizer_msg = PointStamped()
@@ -104,14 +100,13 @@ class PotentialField:
 
         # Now, create a steering command to send to the vesc.
         command_msg = AckermannDriveStamped()
-        command_msg.drive.steering_angle = (self.p_steering * np.sign(total_x_component) * math.atan2(total_y_component, total_x_component)) + (-1*0.07 * d_val)
-        command_msg.drive.speed = (self.p_speed * np.sign(total_x_component) * math.sqrt(total_x_component**2 + total_y_component**2))
-        command_msg.drive.speed = self.kickOut(command_msg.drive.speed)
-        #print command_msg
-        #print command_msg.drive.speed
-        # Publish the command
+        command_msg.drive.steering_angle = (self.p_steering * np.sign(total_x_component) * math.atan2(total_y_component+self.p_d*d_val, total_x_component))
+        command_msg.drive.speed = (self.p_speed * np.sign(total_x_component) * math.sqrt(total_x_component**2 + total_y_component**2)) * should_brake
+
         self.pub_nav.publish(command_msg)
-	self.last_y = total_y_component
+	# Log the last y, but slow down the derivative
+	self.last_y = (self.last_y/2.0) + (total_y_component/2.0)
+
     def kickOut(self, speed):
         self.speedHist = (self.speedHist * .75) + (abs(speed) * .25)
         #print self.speedHist
